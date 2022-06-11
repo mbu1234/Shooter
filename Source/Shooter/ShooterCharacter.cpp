@@ -27,6 +27,7 @@ AShooterCharacter::AShooterCharacter() :
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.f; // camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Whenever the controller moves, the spring arm is going to use the controller's rotation
+	CameraBoom->SocketOffset = FVector(0.f, 50.f, 50.f); // The spring arm (with camera attached!) will now be 50cm to the right and 50cm up from the character
 	CameraBoom->bEnableCameraLag = true;
 	CameraBoom->bEnableCameraRotationLag = true;
 	CameraBoom->CameraLagSpeed = 5.f;
@@ -37,13 +38,13 @@ AShooterCharacter::AShooterCharacter() :
 	FollowCamera->bUsePawnControlRotation = false; // We don't want the camera to rotate - We only want it to follow the spring arm's rotation
 	
 
-	// Don't rotate the character when the controller rotates. Let the controller only effect the camera (Blueprint values will override!)
+	// We are going to allow the character to rotate along with the controller (yaw only)
 	bUseControllerRotationPitch = false;   
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
-	// Rotate character to the direction of input at the rotation rate specified (yaw only)
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	// We will no longer rotate character to the direction of input at the rotation rate specified (yaw only) - bOrientRotationToMovement was true, now false
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 
 	GetCharacterMovement()->JumpZVelocity = 600.f;
