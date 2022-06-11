@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "DrawDebugHelpers.h"
 
 // Testing SC
 
@@ -116,6 +117,24 @@ void AShooterCharacter::FireWeapon()
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
+
+
+		// Let's perform a line trace
+
+		FHitResult FireHit;
+		const FVector Start{ SocketTransform.GetLocation() };
+		const FQuat Rotation{ SocketTransform.GetRotation() };   // Remeber that calling GetRotation on a SocketTransform returns a Quaterion
+		const FVector RotationAxis{ Rotation.GetAxisX() };  // Get the X axis of the rotation
+		const FVector End{ Start + RotationAxis * 50'000.f };  // An ' can be used to make larger numbers more readible - The compiler doesn't care
+
+		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
+
+		if (FireHit.bBlockingHit) {
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+			DrawDebugPoint(GetWorld(), FireHit.Location, 5, FColor::Red, false, 2.f);
+			
+		}
+
 
 		// We want to play the weapon fire montage - not we need to get the anim instance from the mesh and then from the anim instance, we can call Montage_Play()
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
