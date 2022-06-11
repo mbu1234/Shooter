@@ -38,6 +38,10 @@ protected:
 	void LookUpRate(float Rate);
 
 
+	// Called when the fire button is pressed
+	void FireWeapon();
+
+
 
 public:	
 	// Called every frame
@@ -50,20 +54,30 @@ public:
 
 private:
 	/** Camera Boom positioned behind the character*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess="true"))
 	class USpringArmComponent* CameraBoom;
 
 	/** Camera which will attach to the camera boom */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
 	/** Base turn rate in deg/sec - Other scaling may effect the final turn rate*/ 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float BaseTurnRate;  // for yaw movement only
 
 	/** Base look up/down rate in deg/sec - Other scaling may effect the final turn rate */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera , meta = (AllowPrivateAccess = "true"))
 	float BaseLookUpRate;
+
+	/** Randomised fire sound cue for gun shot */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	class USoundCue* FireSound;
+
+	/** Spawned particle system at BarrelSocket (Weapon) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* MuzzleFlash;
+
+
 
 public:
 	/**Returns the CameraBoom subobject (Getter) */
@@ -71,5 +85,8 @@ public:
 
 	/** Returns the Camera subobject (Getter) */
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+
+
 
 };
