@@ -117,6 +117,13 @@ void AShooterCharacter::FireWeapon()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
 
+		// We want to play the weapon fire montage - not we need to get the anim instance from the mesh and then from the anim instance, we can call Montage_Play()
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance && HipFireMontage) {
+			AnimInstance->Montage_Play(HipFireMontage);
+			AnimInstance->Montage_JumpToSection(FName("StartFire"));
+		}
 
 	}
 	
