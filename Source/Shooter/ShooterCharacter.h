@@ -42,6 +42,11 @@ protected:
 	void FireWeapon();
 
 
+	// Note that Muzzle Socket Location doesn't change but the beam location will change (if an object get's in the way of what we are aiming - We'll refer to the second
+	// parameter as an out parameter as it will change for an object that gets in the way
+	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
+
+
 
 public:	
 	// Called every frame
