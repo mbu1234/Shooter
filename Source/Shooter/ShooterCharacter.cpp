@@ -140,6 +140,8 @@ void AShooterCharacter::FireWeapon()
 		FVector CrosshairWorldPosition;
 		FVector CrosshairWorldDirection;
 
+
+		// Deproject the screen space location of the crosshairs to worldspace and get the world direction of the crosshairs
 		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
 
 		// Was deprojection successful?
@@ -149,14 +151,32 @@ void AShooterCharacter::FireWeapon()
 			const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000 };  // We'll add the direction vector of the world position of the crosshairs * a constant - to project into the world
 
 			FVector BeamEndPoint{ End };  // If our line trace is successfull, BeamEndPoint will be the impact point - right now, its the end point as defined above
+
+
 			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);  // perform the trace
 
 			if (ScreenTraceHit.bBlockingHit) {  // did we get a blocking hit - i.e. intercepted by a mesh with a visibility collision channel
 				BeamEndPoint = ScreenTraceHit.Location; // store the beam end point as the impact point
 
-				if (ImpactParticles) {  // is the particle system pointer valid?
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);  // spawn the particles at the impact point (ScreenTraceHit.Location)
-				}
+			}
+
+
+			// Perform a second trace - this time from the gun barrel
+			FHitResult WeaponTraceHit;
+
+			const FVector WeaponTraceStart{ SocketTransform.GetLocation() }; 
+			const FVector WeaponTraceEnd{ BeamEndPoint };
+			GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+
+			if (WeaponTraceHit.bBlockingHit) { // object between barrel and beam end point, if so , we need to set the beam end point to the weapson trace hit location
+				BeamEndPoint = WeaponTraceHit.Location;
+			}
+
+
+			// Make sure to spawn impact particles after the second blocking hit - i.e.  after beam end point (i.e. if an object gets in the way of another object)
+
+			if (ImpactParticles) {  // is the particle system pointer valid?
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEndPoint);  // spawn the particles at the impact point (BeamEndPoint)
 			}
 
 			if (BeamParticles) {  // is the beam particles pointer valid?
