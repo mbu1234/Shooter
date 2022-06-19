@@ -45,7 +45,7 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 		FRotator AimRotation = ShooterCharacter->GetBaseAimRotation();  // THe direction we are aiming in 
 		FRotator MovementRotation = UKismetMathLibrary::MakeRotFromX(ShooterCharacter->GetVelocity()); //The movement velocity
 
-		MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw; //Calculating the difference between the direction we are aiming in and the velocity we are moving in
+		MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw; //Calculating the difference between the velocity we are moving in and the direction we are aiming at
 		// We'll use this value for our Anim Blueprint to set the correct straffing animation
 
 
@@ -54,9 +54,11 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 
 		FString OffsetMessage = FString::Printf(TEXT("Movement Offset Yaw: %f"), MovementOffsetYaw);
 		
-		if (GEngine) {
+		/*if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::White, OffsetMessage);
-		}
+		}*/
+
+
 
 
 	}
