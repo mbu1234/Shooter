@@ -46,6 +46,10 @@ protected:
 	// parameter as an out parameter as it will change for an object that gets in the way
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 
+	// Set bAiming to true or false when the aiming button is pressed or released  on controller/keyboard
+	void AimingButtonPressed();
+	void AimingButtonReleased();
+
 
 
 public:	
@@ -94,7 +98,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* BeamParticles;
 
+	// True when aiming
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	bool bAiming;
 
+	// Default camera field of view
+	float CameraDefaultFOV;
+
+	// Default zoom value when camera is zoomed in
+	float CameraZoomedFOV;
 
 public:
 	/**Returns the CameraBoom subobject (Getter) */
