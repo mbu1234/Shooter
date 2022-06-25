@@ -206,6 +206,8 @@ public:
 	FORCEINLINE bool GetAiming() const { return bAiming; }  // we are going to use the Amininstance class to get the value of bAiming from this class (bAiming is private so using a getter)
 
 
+	UFUNCTION(BlueprintCallable)
+	float GetCrosshairSpreadMultiplier() const;   // Just a getter to return CrosshairSpreadMultiplier -  Remember blueprint callable functions cannot be FORCEINLINE
 
 
 };
