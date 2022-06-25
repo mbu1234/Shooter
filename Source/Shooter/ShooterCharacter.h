@@ -68,8 +68,13 @@ protected:
 	// Set BaseTurnRate and BaseLookUpRate based on whether we are aiming or not
 	void SetLookRates();   
 
-
+	// Calculate the amount of crosshair spread which is used in the HUD BP for drawing seperate arms of the crosshairs on screen once the value is calculated
 	void CalculateCrosshairSpread(float DeltaTime);
+
+	void StartCrossHairBulletFire();
+
+	UFUNCTION()
+	void FinishCrossHairBulletFire(); // This is a callback function for an FTimerHandle - must be a UFUNCTION
 
 
 
@@ -194,6 +199,15 @@ private:
 	// Shooting component for crosshairs spread
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Crosshairs, meta = (AllowPrivateAccess = "true"))
 	float CrosshairShootingFactor;
+
+
+	float ShootTimeDuration;
+
+
+	bool bFiringBullet;
+
+
+	FTimerHandle CrosshairShootTimer;
 
 
 public:

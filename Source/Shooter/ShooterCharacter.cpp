@@ -41,7 +41,10 @@ AShooterCharacter::AShooterCharacter() :
 	CrosshairVelocityFactor(0.f),
 	CrosshairInAirFactor(0.f),
 	CrosshairAimFactor(0.f),
-	CrosshairShootingFactor(0.f)
+	CrosshairShootingFactor(0.f),
+	// Bullet fire timer variables
+	ShootTimeDuration(0.05f),
+	bFiringBullet(false)
 
 
 
@@ -210,7 +213,10 @@ void AShooterCharacter::FireWeapon()
 		if (AnimInstance && HipFireMontage) {
 			AnimInstance->Montage_Play(HipFireMontage);
 			AnimInstance->Montage_JumpToSection(FName("StartFire"));
-		}	
+		}
+
+		// Start bullet fire timer for crosshairs
+		StartCrossHairBulletFire();
 	
 }
 
@@ -363,7 +369,32 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f); // We are going to widen the crosshairs quickly when not aiming
 	}
 
-	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor;
+
+	if (bFiringBullet) {  // True 0.05 seconds after firing, then false
+		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.3f, DeltaTime, 60.f);  // Remember, we only have 0.05 seconds so using a high interp speed
+	}
+	else {
+		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 60.f); // Interp back to 0 when not firing (i.e. 0.05 seconds after firing
+	}
+
+	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
+}
+
+
+// When this function is called (in FireWeapon), set the boolean bFiringBullet to true and start a new timer called CrosshairShooterTimer defined as a TimerHandle in the .h 
+// Call The FinishCrossHairBulletFire function after ShootTimeDuration has passed
+// With the spread function for the crosshairs, we can test for bFiringBullet and if true, we can widen the crosshairs gradually
+
+void AShooterCharacter::StartCrossHairBulletFire()
+{
+	bFiringBullet = true;
+
+	GetWorldTimerManager().SetTimer(CrosshairShootTimer, this, &AShooterCharacter::FinishCrossHairBulletFire, ShootTimeDuration);
+}
+
+void AShooterCharacter::FinishCrossHairBulletFire()
+{
+	bFiringBullet = false;
 }
 
 
