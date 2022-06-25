@@ -35,7 +35,14 @@ AShooterCharacter::AShooterCharacter() :
 	CameraDefaultFOV(0.f),   // set in beginplay 
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),
-	ZoomInterpSpeed(20.f)
+	ZoomInterpSpeed(20.f),
+	// Crosshair spread factors
+	CrosshairSpreadMultiplier(0.f),
+	CrosshairVelocityFactor(0.f),
+	CrosshairInAirFactor(0.f),
+	CrosshairAimFactor(0.f),
+	CrosshairShootingFactor(0.f)
+
 
 
 {
@@ -346,7 +353,17 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime, 30.f);  // Character is on the ground - we want the crosshairs to shrink quickly, hence a high speed value
 	}
 
-	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor;
+	//Here, we are going to claculate CrossHairAimFactor
+
+	if (bAiming) {  // Are we aiming
+		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.5f, DeltaTime, 30.f); // We are going to tighen the crosshairs quickly
+		
+	}
+	else {
+		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f); // We are going to widen the crosshairs quickly when not aiming
+	}
+
+	CrosshairSpreadMultiplier = 0.5f + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor;
 }
 
 
