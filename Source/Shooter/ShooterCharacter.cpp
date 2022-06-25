@@ -16,13 +16,28 @@
 // Sets default values
 AShooterCharacter::AShooterCharacter() :
 
+	// Base rates for turning/lookup
 	BaseTurnRate(45.f),
 	BaseLookUpRate(45.f),
+	// Turn rates when aiming/not aiming
+	HipTurnRate(90.f),
+	HipLookUpRate(90.f),
+	AimingTurnRate(20.f),
+	AimingLookUpRate(20.f),
+	// Mouse look sensitivity scale vectors
+	MouseHipTurnRate(1.0f),
+	MouseHipLookUpRate(1.0f),
+	MouseAimingTurnRate(0.2f),
+	MouseAimingLookUpRate(0.2f),
+	// Turn when aiming the weapon
 	bAiming(false),
+	// Camera field of view values for zooming
 	CameraDefaultFOV(0.f),   // set in beginplay 
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),
 	ZoomInterpSpeed(20.f)
+
+
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -112,6 +127,36 @@ void AShooterCharacter::LookUpRate(float Rate)
 {
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());  //  deg/sec * sec/frame = deg/frame
 }
+
+
+
+void AShooterCharacter::Turn(float value)   // needed specifically when using the mouse rather than keyboard or controller
+{
+	float TurnScaleFactor;
+	if (bAiming) {
+		TurnScaleFactor = MouseAimingTurnRate;
+	}
+	else {
+		TurnScaleFactor = MouseHipTurnRate;
+	}
+	AddControllerYawInput(value * TurnScaleFactor);
+}
+
+
+
+void AShooterCharacter::LookUp(float value)
+{
+	float LookUpScaleFactor;
+	if (bAiming) {
+		LookUpScaleFactor = MouseAimingLookUpRate;
+	}
+	else {
+		LookUpScaleFactor = MouseHipLookUpRate;
+	}
+	AddControllerPitchInput(value * LookUpScaleFactor);
+}
+
+
 
 void AShooterCharacter::FireWeapon()
 {
@@ -247,6 +292,11 @@ void AShooterCharacter::Tick(float DeltaTime)
 
 	CameraInterpZoom(DeltaTime);
 
+	// Change look sensitivity based on whether we are aiming or not
+	SetLookRates();
+
+
+
 }
 
 
@@ -264,6 +314,18 @@ void AShooterCharacter::CameraInterpZoom(float DeltaTime) {
 	
 }
 
+void AShooterCharacter::SetLookRates()
+{
+	if (bAiming) {
+		BaseTurnRate = AimingTurnRate;
+		BaseLookUpRate = AimingLookUpRate;
+	}
+	else {
+		BaseTurnRate = HipTurnRate;
+		BaseLookUpRate = AimingLookUpRate;
+	}
+}
+
 
 // Called to bind functionality to input
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -277,8 +339,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis("TurnRate", this, &AShooterCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AShooterCharacter::LookUpRate);
 
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);  // Let's use the parent pawn class for this :)
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("Turn", this, &AShooterCharacter::Turn);  // This function is just for mouse input only
+	PlayerInputComponent->BindAxis("LookUp", this, &AShooterCharacter::LookUp); // This function is also just for mouse input only
 
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ACharacter::Jump);   // Let's use the parent base character class for this :)
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ACharacter::StopJumping);
