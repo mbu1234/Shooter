@@ -62,6 +62,7 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 			LastMovementOffsetYaw = MovementOffsetYaw;    // we want to capture the offset yaw for the previous frame if not zero!
 		}
 
+		bAiming = ShooterCharacter->GetAiming();  // Using a getter as bAiming in the shooter character class is private
 
 	}
 

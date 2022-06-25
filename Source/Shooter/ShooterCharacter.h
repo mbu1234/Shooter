@@ -125,6 +125,8 @@ public:
 	/** Returns the Camera subobject (Getter) */
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	FORCEINLINE bool GetAiming() const { return bAiming; }  // we are going to use the Amininstance class to get the value of bAiming from this class (bAiming is private so using a getter)
+
 
 
 
